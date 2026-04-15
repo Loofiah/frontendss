@@ -12,17 +12,26 @@ const gameContainer = document.getElementById('game-container');
 // 游戏参数配置 (方便修改)
 const GAME_CONFIG = {
     gravity: 0.7,         // 重力，影响下落速度
-    jumpStrength: 13,     // 跳跃力度
+    jumpStrength: 13,     // 第一段跳跃力度
+    secondJumpStrength: 10, // 二段跳稍弱一些，让二次起跳不那么突兀生硬，使得轨迹更平滑
+    maxJumps: 2,          // 最大连续跳跃次数（2即为二段跳）
+    jumpCooldown: 60,     // 缩短防误触冷却时间(毫秒)，优化短时间内连按的手感
     obstacleSpeed: 6,     // 障碍物移动速度
     minSpawnTime: 1000,   // 障碍物生成的最小间隔(毫秒)
     maxSpawnTime: 2200,   // 障碍物生成的最大间隔(毫秒)
-    scorePerJump: 10,     // 每次成功跨越获得的分数
-    obstacleColors: ['#F44336', '#FFEB3B', '#2196F3'] // 障碍物的随机配色：红、黄、蓝
+    scorePerJump: 10,     // 普通障碍每次成功跨越获得的分数
+    tallScorePerJump: 20, // 高大障碍跨越后获得的高分奖励
+    obstacleColors: ['#F44336', '#FFEB3B', '#2196F3'], // 障碍物的随机配色：红、黄、蓝
+    normalObstacleHeight: 45, // 普通障碍物的基础高度(像素)
+    tallObstacleHeight: 140,  // 高障碍物高度，由于单次跳跃只能大概达到120高度，故必须二段跳
+    tallObstacleChance: 0.25  // 出现高障碍物的随机概率 (25%)
 };
 
 // 游戏状态
 let isPlaying = false;
 let isJumping = false;
+let jumpCount = 0;     // 当前已跳跃次数记录
+let lastJumpTime = 0;  // 上一次跳跃的时间戳，用于防误触
 let playerBottom = 20; // 初始Y坐标 (对应CSS中的bottom: 20px)
 let velocityY = 0;
 let score = 0;
@@ -45,10 +54,25 @@ function handleKeyDown(e) {
 }
 
 function jump() {
-    // 只有在地面上才可以跳跃
-    if (!isJumping) {
+    const currentTime = Date.now();
+    // 允许根据最大跳跃次数进行连跳 (实现二段跳功能)
+    if (jumpCount < GAME_CONFIG.maxJumps) {
+        // 防止误触：检查是否过了最小冷却时间 (比如0.15秒)
+        if (currentTime - lastJumpTime < GAME_CONFIG.jumpCooldown) {
+            return;
+        }
+
         isJumping = true;
-        velocityY = GAME_CONFIG.jumpStrength;
+        
+        // 平滑的跳跃逻辑：如果是二段跳，力度稍弱，让运动轨迹显得不那么生硬
+        if (jumpCount === 0) {
+            velocityY = GAME_CONFIG.jumpStrength;
+        } else {
+            velocityY = GAME_CONFIG.secondJumpStrength; 
+        }
+
+        jumpCount++;
+        lastJumpTime = currentTime;
     }
 }
 
@@ -65,6 +89,8 @@ function startGame() {
     playerBottom = 20;
     velocityY = 0;
     isJumping = false;
+    jumpCount = 0;
+    lastJumpTime = 0;
     player.style.bottom = playerBottom + 'px';
     
     // 清理旧的障碍物
@@ -114,6 +140,7 @@ function updatePlayer() {
         if (playerBottom <= 20) {
             playerBottom = 20;
             isJumping = false;
+            jumpCount = 0; // 落地恢复跳跃次数，允许再次起跳
             velocityY = 0;
         }
         player.style.bottom = playerBottom + 'px';
@@ -126,6 +153,10 @@ function generateObstacle() {
     const obstacle = document.createElement('div');
     obstacle.classList.add('obstacle');
     
+    // 随机决定是否生成需要二段跳的【高障碍物】
+    const isTall = Math.random() < GAME_CONFIG.tallObstacleChance;
+    obstacle.style.height = isTall ? GAME_CONFIG.tallObstacleHeight + 'px' : GAME_CONFIG.normalObstacleHeight + 'px';
+    
     // 随机选取颜色
     const colorIndex = Math.floor(Math.random() * GAME_CONFIG.obstacleColors.length);
     const selectedColor = GAME_CONFIG.obstacleColors[colorIndex];
@@ -136,7 +167,8 @@ function generateObstacle() {
         element: obstacle,
         x: 800,           // 初始X坐标，从屏幕右侧出现
         passed: false,    // 是否已经被玩家跨越
-        color: selectedColor // 记录颜色传递给得分特效
+        color: selectedColor, // 记录颜色传递给得分特效
+        scoreValue: isTall ? GAME_CONFIG.tallScorePerJump : GAME_CONFIG.scorePerJump // 动态绑定分数
     };
     
     gameArea.appendChild(obstacle);
@@ -159,7 +191,8 @@ function updateObstacles() {
         // 设定为 30px 确保玩家已经跨过了它
         if (obs.x < 30 && !obs.passed) {
             obs.passed = true;
-            addScore(GAME_CONFIG.scorePerJump, obs.x, 20, obs.color); 
+            // 获取该类型障碍物的专属分数并传参
+            addScore(obs.scoreValue, obs.x, 20, obs.color); 
         }
     }
     
