@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>欢乐耄耋快跑</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="game-wrapper">
+        <div id="game-container">
+            <!-- 游戏开始/介绍画面 -->
+            <div id="start-screen">
+                <button id="start-btn">开始游戏</button>
+                <div class="instructions">
+                    <span>使用</span>
+                    <div class="arrow-keys">
+                        <div class="row"><span class="btn-key">&uarr;</span></div>
+                        <div class="row">
+                            <span class="btn-key">&larr;</span>
+                            <span class="btn-key">&darr;</span>
+                            <span class="btn-key">&rarr;</span>
+                        </div>
+                    </div>
+                    <span>或</span>
+                    <span class="btn-key wide">空格键</span>
+                </div>
+            </div>
+
+            <!-- 游戏结束画面 -->
+            <div id="game-over-screen" class="hidden">
+                <h2>游戏结束</h2>
+                <p>最终得分: <span id="final-score">0</span></p>
+                <button id="restart-btn">重新开始</button>
+            </div>
+
+            <!-- 当前得分区域 -->
+            <div id="score-container" class="hidden">
+                得分: <span id="score">0</span>
+            </div>
+
+            <!-- 核心游戏区域 -->
+            <div id="game-area">
+                <div id="player"></div>
+                <div id="ground"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗分数特效容器 -->
+    <div id="effects-layer"></div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
