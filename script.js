@@ -24,7 +24,7 @@ const GAME_CONFIG = {
     tallScorePerJump: 20, // 高大障碍跨越后获得的高分奖励
     obstacleColors: ['#F44336', '#FFEB3B', '#2196F3'], // 障碍物的随机配色：红、黄、蓝
     normalObstacleHeight: 45, // 普通障碍物的基础高度(像素)
-    tallObstacleHeight: 140,  // 高障碍物高度，由于单次跳跃只能大概达到120高度，故必须二段跳
+    tallObstacleHeight: 112,  // 高障碍物高度 (原140的0.8倍)，稍微降低了难度，仍需二段跳
     tallObstacleChance: 0.25  // 出现高障碍物的随机概率 (25%)
 };
 
