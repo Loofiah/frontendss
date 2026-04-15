@@ -108,6 +108,11 @@ button:hover {
     letter-spacing: 2px;
 }
 
+.high-score-text {
+    margin-right: 20px;
+    color: #888;
+}
+
 /* Game Elements */
 #game-area {
     position: absolute;

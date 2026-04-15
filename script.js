@@ -1,6 +1,7 @@
 const player = document.getElementById('player');
 const gameArea = document.getElementById('game-area');
 const scoreElement = document.getElementById('score');
+const highScoreElement = document.getElementById('high-score');
 const startScreen = document.getElementById('start-screen');
 const gameOverScreen = document.getElementById('game-over-screen');
 const scoreContainer = document.getElementById('score-container');
@@ -35,6 +36,7 @@ let lastJumpTime = 0;  // 上一次跳跃的时间戳，用于防误触
 let playerBottom = 20; // 初始Y坐标 (对应CSS中的bottom: 20px)
 let velocityY = 0;
 let score = 0;
+let highScore = parseInt(localStorage.getItem('dinoHighScore')) || 0; // 从本地读取历史最高分
 let obstacles = [];
 let obstacleTimerId;
 let gameLoopId;
@@ -85,6 +87,7 @@ function startGame() {
     // 初始化状态
     isPlaying = true;
     score = 0;
+    highScoreElement.innerText = highScore; // 游戏开始时显示最高分
     updateScoreDisplay();
     playerBottom = 20;
     velocityY = 0;
@@ -223,6 +226,14 @@ function checkCollision() {
 
 function addScore(points, xPos, yPos, color) {
     score += points;
+    
+    // 监听与更新最高记录
+    if (score > highScore) {
+        highScore = score;
+        highScoreElement.innerText = highScore;
+        localStorage.setItem('dinoHighScore', highScore.toString());
+    }
+    
     updateScoreDisplay(); // 更新右上方的基础灰色得分显示
     
     // 动态分数弹窗效果
