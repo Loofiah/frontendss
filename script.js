@@ -16,7 +16,8 @@ const GAME_CONFIG = {
     obstacleSpeed: 6,     // 障碍物移动速度
     minSpawnTime: 1000,   // 障碍物生成的最小间隔(毫秒)
     maxSpawnTime: 2200,   // 障碍物生成的最大间隔(毫秒)
-    scorePerJump: 10      // 每次成功跨越获得的分数
+    scorePerJump: 10,     // 每次成功跨越获得的分数
+    obstacleColors: ['#F44336', '#FFEB3B', '#2196F3'] // 障碍物的随机配色：红、黄、蓝
 };
 
 // 游戏状态
@@ -125,11 +126,17 @@ function generateObstacle() {
     const obstacle = document.createElement('div');
     obstacle.classList.add('obstacle');
     
+    // 随机选取颜色
+    const colorIndex = Math.floor(Math.random() * GAME_CONFIG.obstacleColors.length);
+    const selectedColor = GAME_CONFIG.obstacleColors[colorIndex];
+    obstacle.style.backgroundColor = selectedColor;
+
     // 障碍物的数据结构
     let obsData = {
         element: obstacle,
         x: 800,           // 初始X坐标，从屏幕右侧出现
-        passed: false     // 是否已经被玩家跨越
+        passed: false,    // 是否已经被玩家跨越
+        color: selectedColor // 记录颜色传递给得分特效
     };
     
     gameArea.appendChild(obstacle);
@@ -152,7 +159,7 @@ function updateObstacles() {
         // 设定为 30px 确保玩家已经跨过了它
         if (obs.x < 30 && !obs.passed) {
             obs.passed = true;
-            addScore(GAME_CONFIG.scorePerJump, obs.x, 20); 
+            addScore(GAME_CONFIG.scorePerJump, obs.x, 20, obs.color); 
         }
     }
     
@@ -181,14 +188,15 @@ function checkCollision() {
     return false;
 }
 
-function addScore(points, xPos, yPos) {
+function addScore(points, xPos, yPos, color) {
     score += points;
-    updateScoreDisplay();
+    updateScoreDisplay(); // 更新右上方的基础灰色得分显示
     
     // 动态分数弹窗效果
     const popup = document.createElement('div');
     popup.classList.add('score-popup');
     popup.innerText = '+' + points;
+    popup.style.color = color; // 根据越过障碍物变换特效颜色
     
     // 设置弹窗起始位置 (在跨越的障碍物上方)
     popup.style.left = (xPos + 20) + 'px';
