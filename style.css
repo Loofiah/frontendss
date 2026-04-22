@@ -42,6 +42,46 @@ body {
     background-color: rgba(242, 242, 242, 0.8);
 }
 
+/* Game Title Pixel Art Style */
+.game-title {
+    font-size: 56px;
+    font-weight: 900;
+    font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+    letter-spacing: 6px;
+    margin: 0 0 30px 0;
+    text-align: center;
+    
+    /* 像素方格背景纹理 (白色底色与灰色网格) */
+    background-color: #fff;
+    background-image: 
+        linear-gradient(#ccc 1px, transparent 1px),
+        linear-gradient(90deg, #ccc 1px, transparent 1px);
+    background-size: 6px 6px;
+    background-position: center bottom;
+    
+    /* 将背景剪裁贴图到文字形状上 */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    
+    /* 描出内部加粗边缘 */
+    -webkit-text-stroke: 3px #111;
+    
+    /* 使用多重drop-shadow模拟像素风格的厚重粗黑外边框 */
+    filter: drop-shadow(4px 4px 0px #111) 
+            drop-shadow(-2px -2px 0px #111) 
+            drop-shadow(2px -2px 0px #111) 
+            drop-shadow(-2px 2px 0px #111);
+            
+    /* 细微的呼吸漂浮动画增加灵动感 */
+    animation: bounceTitle 2s infinite ease-in-out;
+}
+
+@keyframes bounceTitle {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-8px) scale(1.02); }
+}
+
 .hidden {
     display: none !important;
 }
