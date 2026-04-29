@@ -10,7 +10,7 @@ const restartBtn = document.getElementById('restart-btn');
 const finalScoreElement = document.getElementById('final-score');
 const gameContainer = document.getElementById('game-container');
 
-// 游戏参数配置 (方便修改)
+// 游戏参数配置
 const GAME_CONFIG = {
     gravity: 0.4,         // 减小重力以延长滞空时间，使下落变缓
     jumpStrength: 10,     // 相应减小第一段跳跃力度，保持跳跃总高度基本不变
@@ -51,6 +51,10 @@ function handleKeyDown(e) {
     if ((e.code === 'Space' || e.code === 'ArrowUp') && isPlaying) {
         // 防止默认的网页滚动
         e.preventDefault();
+        
+        // 【修正的逻辑错误】：防止长按按键时浏览器触发连续的 keydown 事件，导致在空中自动消耗掉二段跳
+        if (e.repeat) return;
+        
         jump();
     }
 }
@@ -65,6 +69,7 @@ function jump() {
         }
 
         isJumping = true;
+        player.classList.add('player-jumping');
 
         // 平滑的跳跃逻辑：如果是二段跳，力度稍弱，让运动轨迹显得不那么生硬
         if (jumpCount === 0) {
@@ -95,6 +100,10 @@ function startGame() {
     jumpCount = 0;
     lastJumpTime = 0;
     player.style.bottom = playerBottom + 'px';
+    player.classList.remove('player-jumping');
+
+    // 清除可能正在进行的摇晃特效
+    document.getElementById('game-wrapper').classList.remove('shake-screen');
 
     // 清理旧的障碍物
     obstacles.forEach(obs => obs.element.remove());
@@ -114,6 +123,15 @@ function gameOver() {
     isPlaying = false;
     clearTimeout(obstacleTimerId);
     cancelAnimationFrame(gameLoopId);
+
+    // 碰撞发生时给游戏容器添加摇晃效果
+    const gameWrapper = document.getElementById('game-wrapper');
+    gameWrapper.classList.add('shake-screen');
+    
+    // 2秒后（动画结束）自动移除摇晃类，保证下次碰撞能正常触发
+    setTimeout(() => {
+        gameWrapper.classList.remove('shake-screen');
+    }, 2000);
 
     finalScoreElement.innerText = score;
     gameOverScreen.classList.remove('hidden');
@@ -145,6 +163,7 @@ function updatePlayer() {
             isJumping = false;
             jumpCount = 0; // 落地恢复跳跃次数，允许再次起跳
             velocityY = 0;
+            player.classList.remove('player-jumping');
         }
         player.style.bottom = playerBottom + 'px';
     }

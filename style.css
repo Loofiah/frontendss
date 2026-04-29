@@ -28,7 +28,8 @@ body {
 }
 
 /* UI overlays */
-#start-screen, #game-over-screen {
+#start-screen,
+#game-over-screen {
     position: absolute;
     top: 0;
     left: 0;
@@ -50,36 +51,40 @@ body {
     letter-spacing: 6px;
     margin: 0 0 30px 0;
     text-align: center;
-    
+
     /* 像素方格背景纹理 (白色底色与灰色网格) */
     background-color: #fff;
-    background-image: 
+    background-image:
         linear-gradient(#ccc 1px, transparent 1px),
         linear-gradient(90deg, #ccc 1px, transparent 1px);
     background-size: 6px 6px;
     background-position: center bottom;
-    
+
     /* 将背景剪裁贴图到文字形状上 */
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    
+
     /* 描出内部加粗边缘 */
     -webkit-text-stroke: 3px #111;
-    
+
     /* 使用多重drop-shadow模拟像素风格的厚重粗黑外边框 */
-    filter: drop-shadow(4px 4px 0px #111) 
-            drop-shadow(-2px -2px 0px #111) 
-            drop-shadow(2px -2px 0px #111) 
-            drop-shadow(-2px 2px 0px #111);
-            
+    filter: drop-shadow(4px 4px 0px #111) drop-shadow(-2px -2px 0px #111) drop-shadow(2px -2px 0px #111) drop-shadow(-2px 2px 0px #111);
+
     /* 细微的呼吸漂浮动画增加灵动感 */
     animation: bounceTitle 2s infinite ease-in-out;
 }
 
 @keyframes bounceTitle {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-8px) scale(1.02); }
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-8px) scale(1.02);
+    }
 }
 
 .hidden {
@@ -158,12 +163,14 @@ button:hover {
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 150px; /* Playable height for player */
+    height: 150px;
+    /* Playable height for player */
 }
 
 #ground {
     position: absolute;
-    bottom: 20px; /* Adjusted to have some space below line */
+    bottom: 20px;
+    /* Adjusted to have some space below line */
     width: 100%;
     height: 1px;
     border-top: 1px dashed #555;
@@ -171,9 +178,10 @@ button:hover {
 
 #player {
     position: absolute;
-    bottom: 20px; /* Starts exactly on the ground */
+    bottom: 20px;
+    /* Starts exactly on the ground */
     left: 50px;
-    width: 50px; 
+    width: 50px;
     height: 50px;
     /* Use the user-provided GIF replacing the small dinosaur */
     background-image: url('walking.gif');
@@ -182,20 +190,34 @@ button:hover {
     background-position: bottom;
 }
 
+#player.player-jumping {
+    background-image: url('jump.gif');
+}
+
 .obstacle {
     position: absolute;
     bottom: 20px;
-    width: 25px; /* Easily modifiable */
-    height: 45px; /* Easily modifiable */
-    background-color: #555; /* Cactus-like block */
+    width: 25px;
+    /* Easily modifiable */
+    height: 45px;
+    /* Easily modifiable */
+    background-color: #555;
+    /* Cactus-like block */
     border-radius: 4px 4px 0 0;
-    right: -50px; 
+    right: -50px;
 }
 
 /* Effect for dynamic scoring */
 @keyframes floatUp {
-    0% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(-40px); }
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-40px);
+    }
 }
 
 .score-popup {
@@ -206,4 +228,33 @@ button:hover {
     animation: floatUp 0.8s ease-out forwards;
     z-index: 20;
     pointer-events: none;
+}
+
+/* 剧烈左右摇晃动画 */
+@keyframes violentShake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-20px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(20px);
+    }
+}
+
+.shake-screen {
+    /* 执行剧烈摇晃，持续2秒，使用ease-out使摇晃逐渐缓和 */
+    animation: violentShake 1s ease-out both;
 }
